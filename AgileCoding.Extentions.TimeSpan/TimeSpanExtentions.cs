@@ -12,7 +12,7 @@
             return parseResult;
         }
 
-        public static TimeSpan ToTimeSpan<IExceptionType>(this string stringValue, string errorMessage = null)
+        public static TimeSpan ToTimeSpan<IExceptionType>(this string stringValue, string? errorMessage = null)
              where IExceptionType : Exception, new()
         {
             string tempErrorMessage = errorMessage == null
@@ -22,7 +22,15 @@
             TimeSpan parseResult;
             if (!TimeSpan.TryParse(stringValue, out parseResult))
             {
-                throw typeof(IExceptionType).CreateInstanceWithoutLogging<IExceptionType>(tempErrorMessage);
+                var exception =  typeof(IExceptionType).CreateInstanceWithoutLogging<IExceptionType>(tempErrorMessage);
+                if (exception != null)
+                {
+                    throw exception;
+                }
+                else
+                {
+                    throw new Exception(tempErrorMessage);
+                }
             }
 
             return parseResult;
